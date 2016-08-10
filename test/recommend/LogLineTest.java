@@ -5,24 +5,33 @@
 package recommend;
 
 import java.util.Date;
+
 import org.junit.*;
+
 import static org.junit.Assert.*;
 
 /**
- *
  * @author steven
  */
 public class LogLineTest {
+    public static final String BASEPAGE = "[08/Aug/2016:20:59:05 +0000] 6.249.6.18 TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 \"GET %s HTTP/1.1\" 4345-3";
+    public static final String VALID_LOG = "[08/Aug/2016:20:59:05 +0000] 6.249.6.18 TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 \"GET /p/APE HTTP/1.1\" 4345-3";
+
+    public static final String QUESTIONINPAGE = String.format(BASEPAGE, "/p/VexSystem?");
+    public static final String INVALIDPAGE = String.format(BASEPAGE, "/p/VexSy@stem");
+    public static final String BADCHARACTERAFTERPAGE = String.format(BASEPAGE, "/p/VexSystem{");
+    public static final String RIGHTCURLEYAFTER = String.format(BASEPAGE, "/p/VexSystem}");
 
     public LogLineTest() {
     }
+
     private LogLine empty;
     private LogLine sample;
 
     @Before
     public void setUp() {
         empty = new LogLine("");
-        sample = new LogLine("182.159.110.144 - - [29/Apr/2012:01:17:35 +0000] \"GET /p/VexSystem HTTP/1.1\" 200 4773 \"-\" \"Java/1.6.0_20");
+        sample = new LogLine(VALID_LOG);
     }
 
     @Test
@@ -32,7 +41,7 @@ public class LogLineTest {
 
     @Test
     public void sampleGetDateVisit() {
-        Date expected = new Date(112, 3, 29, 01, 17, 35);
+        Date expected = new Date(116, 7, 8, 20, 59, 05);
         assertEquals(expected, sample.getDateVisit());
     }
 
@@ -43,7 +52,7 @@ public class LogLineTest {
 
     @Test
     public void sampleGetIpAddress() {
-        String expected = "182.159.110.144";
+        String expected = "6.249.6.18";
         assertEquals(expected, sample.getIpAddress());
     }
 
@@ -54,7 +63,7 @@ public class LogLineTest {
 
     @Test
     public void sampleGetPage() {
-        String expected = "VexSystem";
+        String expected = "APE";
         assertEquals(expected, sample.getPage());
     }
 
@@ -70,52 +79,28 @@ public class LogLineTest {
 
     @Test
     public void questionIsPageValid() {
-        LogLine bad = new LogLine("182.159.110.144 - - [29/Apr/2012:01:17:35 +0000] \"GET /p/VexSystem? HTTP/1.1\" 200 4773 \"-\" \"Java/1.6.0_20");
+        LogLine bad = new LogLine(QUESTIONINPAGE);
         assertFalse(bad.isPageValid());
     }
-    
-    
+
+
     @Test
     public void atIsPageValid() {
-        LogLine bad = new LogLine("182.159.110.144 - - [29/Apr/2012:01:17:35 +0000] \"GET /p/VexSy@stem HTTP/1.1\" 200 4773 \"-\" \"Java/1.6.0_20");
+        LogLine bad = new LogLine(INVALIDPAGE);
         assertFalse(bad.isPageValid());
     }
-    
+
     @Test
     public void leftCuryIsPageValid() {
-        LogLine bad = new LogLine("182.159.110.144 - - [29/Apr/2012:01:17:35 +0000] \"GET /p/VexSystem{ HTTP/1.1\" 200 4773 \"-\" \"Java/1.6.0_20");
+        LogLine bad = new LogLine(BADCHARACTERAFTERPAGE);
         assertFalse(bad.isPageValid());
     }
-    
+
     @Test
     public void rightCurlyIsPageValid() {
-        LogLine bad = new LogLine("182.159.110.144 - - [29/Apr/2012:01:17:35 +0000] \"GET /p/VexSystem} HTTP/1.1\" 200 4773 \"-\" \"Java/1.6.0_20");
+        LogLine bad = new LogLine(RIGHTCURLEYAFTER);
         assertFalse(bad.isPageValid());
     }
-    
-    @Test
-    public void periodIsPageValid() {
-        LogLine bad = new LogLine("182.159.110.144 - - [29/Apr/2012:01:17:35 +0000] \"GET /p/Ve.xSystem HTTP/1.1\" 200 4773 \"-\" \"Java/1.6.0_20");
-        assertFalse(bad.isPageValid());
-    }
-    
-    @Test
-    public void percentageIsPageValid() {
-        LogLine bad = new LogLine("182.159.110.144 - - [29/Apr/2012:01:17:35 +0000] \"GET /p/VexSyst%em HTTP/1.1\" 200 4773 \"-\" \"Java/1.6.0_20");
-        assertFalse(bad.isPageValid());
-    }
-    
-    @Test
-    public void twoInvalidsIsPageValid() {
-        LogLine bad = new LogLine("182.159.110.144 - - [29/Apr/2012:01:17:35 +0000] \"GET /p/Vex.@System HTTP/1.1\" 200 4773 \"-\" \"Java/1.6.0_20");
-        assertFalse(bad.isPageValid());
-    }
-    
-    @Test
-    public void threeInvalidsIsPageValid() {
-        LogLine bad = new LogLine("182.159.110.144 - - [29/Apr/2012:01:17:35 +0000] \"GET /p/Vex.{}System HTTP/1.1\" 200 4773 \"-\" \"Java/1.6.0_20");
-        assertFalse(bad.isPageValid());
-    }
-    
-    
+
+
 }

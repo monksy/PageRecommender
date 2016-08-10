@@ -18,18 +18,15 @@ import java.util.regex.Pattern;
  * @author steven
  */
 public class LogLine {
-
-    private final String logEntryPattern = "^.*(\\b\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\b).*\\[([\\w:/]+\\s[+\\-]\\d{4})\\] \\\"GET \\/p\\/(.+?) HTTP.*\\\".*$";
     private final String INVALID_PAGE_NAMES = "?@{}.%";
     private String ipAddress = "";
     private String page = "";
     private Date dateVisit;
     public static final int NUM_FIELDS = 3;
+    private final Pattern LOG_PATTERN = Pattern.compile("^\\[(.*?)\\].*(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}).*GET /[ap]/(.*?) .*$");
 
     public LogLine(String logEntryLine) {
-
-        Pattern p = Pattern.compile(logEntryPattern);
-        Matcher matcher = p.matcher(logEntryLine);
+        Matcher matcher = LOG_PATTERN.matcher(logEntryLine);
         if (!matcher.matches()
                 || NUM_FIELDS != matcher.groupCount()) {
             System.err.println("Bad log entry (or problem with RE?):");
@@ -37,10 +34,9 @@ public class LogLine {
             return;
         }
 
-        ipAddress = matcher.group(1);
-        String dateString = matcher.group(2);
+        ipAddress = matcher.group(2);
+        String dateString = matcher.group(1);
         page = matcher.group(3);
-// Z
 
         DateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy:hh:mm:ss");
         try {
