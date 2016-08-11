@@ -14,8 +14,8 @@ import static org.junit.Assert.*;
  * @author steven
  */
 public class LogLineTest {
-    public static final String BASEPAGE = "[08/Aug/2016:20:59:05 +0000] 6.249.6.18 TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 \"GET %s HTTP/1.1\" 4345-3";
-    public static final String VALID_LOG = "[08/Aug/2016:20:59:05 +0000] 6.249.6.18 TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 \"GET /p/APE HTTP/1.1\" 4345-3";
+    public static final String BASEPAGE = "[08/Aug/2016:20:59:05 +0000] 126.249.6.18 TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 \"GET %s HTTP/1.1\" 4345-3";
+    public static final String VALID_LOG = "[08/Aug/2016:20:59:05 +0000] 126.249.6.18 TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 \"GET /p/APE HTTP/1.1\" 4345-3";
 
     public static final String QUESTIONINPAGE = String.format(BASEPAGE, "/p/VexSystem?");
     public static final String INVALIDPAGE = String.format(BASEPAGE, "/p/VexSy@stem");
@@ -52,7 +52,7 @@ public class LogLineTest {
 
     @Test
     public void sampleGetIpAddress() {
-        String expected = "6.249.6.18";
+        String expected = "126.249.6.18";
         assertEquals(expected, sample.getIpAddress());
     }
 

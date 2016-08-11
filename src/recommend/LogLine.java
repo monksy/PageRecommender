@@ -23,7 +23,8 @@ public class LogLine {
     private String page = "";
     private Date dateVisit;
     public static final int NUM_FIELDS = 3;
-    private final Pattern LOG_PATTERN = Pattern.compile("^\\[(.*?)\\].*(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}).*GET /[ap]/(.*?) .*$");
+    private final Pattern LOG_PATTERN = Pattern.compile("^\\[(.*?)\\] (\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}).*GET /[ap]/(.*?) .*$");
+
 
     public LogLine(String logEntryLine) {
         Matcher matcher = LOG_PATTERN.matcher(logEntryLine);
@@ -34,16 +35,18 @@ public class LogLine {
             return;
         }
 
-        ipAddress = matcher.group(2);
-        String dateString = matcher.group(1);
-        page = matcher.group(3);
+        copyInto(new Builder().ipAddress(matcher.group(2)).dateVisit(matcher.group(1)).page(matcher.group(3)));
 
-        DateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy:hh:mm:ss");
-        try {
-            dateVisit = (Date) formatter.parse(dateString);
-        } catch (ParseException ex) {
-            Logger.getLogger(LogLine.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    }
+
+    private LogLine(Builder builder) {
+        copyInto(builder);
+    }
+
+    private void copyInto(Builder builder) {
+        ipAddress = builder.ipAddress;
+        page = builder.page;
+        dateVisit = builder.dateVisit;
     }
 
     public Date getDateVisit() {
@@ -65,5 +68,47 @@ public class LogLine {
             }
         }
         return true;
+    }
+
+
+    public static final class Builder {
+        private String ipAddress;
+        private String page;
+        private Date dateVisit;
+
+        public Builder() {
+        }
+
+        public Builder ipAddress(String val) {
+            ipAddress = val;
+            return this;
+        }
+
+        public Builder page(String val) {
+            page = val;
+            return this;
+        }
+
+        public Builder dateVisit(Date val) {
+            dateVisit = val;
+            return this;
+        }
+
+
+
+        public LogLine build() {
+            return new LogLine(this);
+        }
+
+        public Builder dateVisit(String group) {
+
+            DateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy:hh:mm:ss");
+            try {
+                dateVisit = (Date) formatter.parse(group);
+            } catch (ParseException ex) {
+                Logger.getLogger(LogLine.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return this;
+        }
     }
 }
